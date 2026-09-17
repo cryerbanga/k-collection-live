@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>K Collection Live</title>
+<style>
+:root{--gold:#f4c542;--pink:#ef476f;--bg:#07090d;--card:#121722;--muted:#9da6b5;--green:#22c55e;--line:#252d3a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,sans-serif;font-size:14px;padding-bottom:76px}
+header{position:sticky;top:0;z-index:50;height:58px;padding:8px 12px;background:#0b0e14ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:18px;font-weight:900;color:var(--gold)}.live{background:#e91e63;padding:7px 10px;border-radius:20px;font-weight:800;font-size:10px}
+main{width:100%;margin:0;padding:10px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 6px 20px #0005}.full{width:100%}
+h2{font-size:17px;margin:0 0 10px}h3{font-size:15px;margin:0 0 7px}.small{font-size:11px;color:var(--muted);line-height:1.4}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}label{font-size:10px;color:var(--muted);display:block;margin-bottom:5px}
+input,select,button{width:100%;min-height:43px;border-radius:10px;border:1px solid #343c4b;padding:10px;background:#0b0f16;color:#fff;font-size:13px}button{cursor:pointer;font-weight:800}.primary{background:var(--gold);color:#111;border:0}.danger,.cancel{background:#9f1d2d;border:0}.green{background:var(--green);color:#07120a;border:0}.draw{background:#8b5cf6;color:#fff;border:0}
+.tabs{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding-bottom:3px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tabs button{flex:0 0 auto;width:auto;min-height:38px;padding:8px 11px;font-size:11px}.active{background:#292f3b}.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}.mode-tabs button{min-height:52px;font-size:11px}.mode-tabs button.selected{background:var(--gold);color:#111;border-color:var(--gold)}
+.product{display:flex;gap:10px;align-items:center}.product img{width:105px;height:128px;object-fit:cover;border-radius:12px;background:#222}.code{font-size:25px;font-weight:900;color:var(--gold)}.price{font-size:18px;font-weight:900}.list{max-height:260px;overflow:auto}.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}.row>div:first-child{min-width:0}.avatar{width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:#333;display:inline-flex;align-items:center;justify-content:center;margin-right:7px}.name{font-weight:800}.time{font-size:10px;color:var(--muted)}.badge{padding:5px 7px;border-radius:12px;background:#3a2f09;color:var(--gold);font-size:10px;white-space:nowrap}
+.overlay{min-height:255px;position:relative;overflow:hidden;background:linear-gradient(135deg,#160914,#320b1b 55%,#080a0f);display:flex;align-items:center;justify-content:center;text-align:center;border-radius:12px}.overlay .inner{padding:20px}.crown{font-size:40px}.winner{font-size:28px;color:var(--gold);font-weight:900}.reserve{margin-top:12px;background:#ef476f;padding:11px 16px;border-radius:25px;font-weight:900}
+.product-strip{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;padding:4px 2px 9px;scroll-snap-type:x mandatory;touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}.product-card{flex:0 0 145px;scroll-snap-align:start;background:#0d1118;border:1px solid var(--line);border-radius:12px;padding:8px}.product-card img{width:100%;height:165px;object-fit:cover;border-radius:9px;display:block}.product-card.selected{border:2px solid var(--gold);box-shadow:0 0 0 2px #f4c54233}.price-input{margin-top:6px}.profile{width:34px;height:34px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:7px;background:#333}.cancelled{opacity:.55;text-decoration:line-through}
+#revenueBox{grid-template-columns:1fr 1fr}#revenueBox>div{padding:11px!important;border-radius:10px!important}
+#photoPreview img{width:60px;height:72px;object-fit:cover;border-radius:8px}
+.section-header{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer}.section-header h2{margin:0}.collapseBtn{width:42px;min-height:38px;padding:6px;font-size:20px;background:#0b0f16;border:1px solid #343c4b}.comments-section.collapsed #commentsContent{display:none}.comments-section.collapsed .collapseBtn{transform:rotate(180deg)}
+/* navigation mobile */
+.mobileNav{position:fixed;bottom:0;left:0;right:0;height:68px;z-index:100;background:#0b0e14f5;backdrop-filter:blur(14px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:5px 4px calc(5px + env(safe-area-inset-bottom))}.mobileNav a{color:#9da6b5;text-decoration:none;text-align:center;font-size:9px;font-weight:800;padding:5px 2px;border-radius:10px}.mobileNav a:active{background:#222937;color:#fff}.mobileNav span{display:block;font-size:18px;margin-bottom:2px}
+.sectionTag{font-size:10px;color:var(--gold);font-weight:900;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+@media(min-width:700px){body{padding-bottom:0}main{max-width:760px;margin:auto;padding:16px}.mobileNav{display:none}.grid{grid-template-columns:1fr 1fr}.product-card{flex-basis:170px}}
+.gold{background:#f4c542;color:#111;border:none}.outline{border:1px solid #6b7280;background:transparent;color:#fff}
+</style>
+</head>
+<body>
+<header><div class="logo">👑 K COLLECTION</div><div class="live">● LIVE EN COURS</div></header>
+<main>
+<section class="card full" id="catalogueSection">
+<h2>🛍️ Catalogue K Collection</h2><div class="small">👉 Fais glisser uniquement cette rangée vers la gauche ou la droite pour parcourir les articles. Le reste de l’application reste fixe.</div>
+<div class="tabs" id="catTabs">
+  <button class="active" onclick="setCategory('Tous',this)">Tous</button>
+  <button onclick="setCategory('Robes',this)">Robes</button>
+  <button onclick="setCategory('T-shirts',this)">T-shirts</button>
+  <button onclick="setCategory('Chemises',this)">Chemises</button>
+  <button onclick="setCategory('Pantalons',this)">Pantalons</button>
+  <button onclick="setCategory('Jeans',this)">Jeans</button>
+  <button onclick="setCategory('Jupes',this)">Jupes</button>
+  <button onclick="setCategory('Ensembles',this)">Ensembles</button>
+  <button onclick="setCategory('Chaussures',this)">Chaussures</button>
+  <button onclick="setCategory('Accessoires',this)">Accessoires</button>
+</div>
+<div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+  <div><label>Ajouter des photos</label><input id="photoInput" type="file" accept="image/*" multiple onchange="previewPhotos(event)"></div>
+  <div><label>Nom de l'article</label><input id="newName" placeholder="Ex. Jean cargo"></div>
+  <div><label>Catégorie</label><select id="newCategory">
+    <option>Robes</option><option>T-shirts</option><option>Chemises</option><option>Pantalons</option><option>Jeans</option><option>Jupes</option><option>Ensembles</option><option>Chaussures</option><option>Accessoires</option>
+  </select></div>
+</div>
+<div id="photoPreview" style="display:flex;gap:8px;overflow:auto;margin:10px 0"></div>
+<div id="catalogue" class="product-strip"></div>
+</section>
+
+<section class="card" id="live">
+<h2>🎥 Article sélectionné pour le LIVE</h2>
+<div><label>Mode de commande pour ce LIVE</label><div class="mode-tabs" id="modeTabs">
+<button class="selected" onclick="setMode('multiple',this)">👥 Plusieurs clients</button>
+<button onclick="setMode('first',this)">🥇 1er commentaire</button>
+<button onclick="setMode('lottery',this)">🎲 Tirage au sort</button>
+<button onclick="setMode('manual',this)">✋ Sélection manuelle</button>
+</div><div id="modeHelp" class="small">Tous les clients qui manifestent leur intérêt peuvent être enregistrés.</div></div>
+<div class="product">
+<img id="photo" src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=400&q=80">
+<div style="flex:1"><div class="code" id="code">K125</div><h3 id="article">Robe élégante</h3><div class="small" id="details">Taille M/L · Noir</div><div class="price" id="price">8 500 FCFA</div></div>
+</div><br>
+<div class="grid">
+<div><label>Code commentaire</label><input id="codeInput" value="K125"></div>
+<div><label>Prix (FCFA)</label><input id="priceInput" value="8500" type="number"></div>
+</div><br>
+<div><label>Choisir le LIVE à gérer</label><div class="tabs" id="liveTabs">
+<button class="active" onclick="switchLive(1,this)">LIVE 1</button><button onclick="switchLive(2,this)">LIVE 2</button><button onclick="switchLive(3,this)">LIVE 3</button><button onclick="switchLive(4,this)">LIVE 4</button>
+</div></div>
+<div class="grid">
+<button class="primary" onclick="startSale()">🚀 Lancer la vente</button>
+<button onclick="nextArticle()">➡️ Terminer / article suivant</button>
+</div>
+<div class="grid" style="margin-top:8px">
+<button class="gold" onclick="saveArticleEdits()">💾 Enregistrer code & prix</button>
+<button class="outline" onclick="simulateSale()">🛒 Simulation de vente</button>
+</div>
+<div id="manualBox" style="display:none;margin-top:10px;padding:10px;border:1px solid #343b48;border-radius:12px;background:#0e1219">
+<label>Client sélectionné manuellement</label>
+<div class="grid"><input id="manualProfile" placeholder="Profil TikTok / @TikTok"></div>
+<button class="primary" style="margin-top:8px" onclick="manualSelect()">✋ Valider ce client</button>
+</div>
+<button id="drawBtn" class="draw" style="display:none;margin-top:8px" onclick="drawWinner()">🎲 Tirer au sort parmi les intéressés</button>
+<p id="status" class="small">Sélectionne un article du catalogue puis lance sa vente.</p>
+</section>
+
+<section class="card comments-section" id="commentsSection">
+<div class="section-header" onclick="toggleComments()">
+  <h2>💬 Commentaires détectés</h2><button type="button" class="collapseBtn" id="commentsToggle" onclick="event.stopPropagation();toggleComments()">⌃</button>
+</div>
+<div id="commentsContent">
+  <div class="list" id="commentsList"></div>
+  <br><button class="primary" onclick="simulateComment()">+ Simuler un commentaire</button>
+</div>
+</section>
+
+<section class="card" id="preview">
+<h2>📱 Aperçu du LIVE</h2>
+<div class="overlay" id="overlay">
+<div class="inner"><div class="crown">👗</div><div>Écrivez <b id="overlayCode">K125</b> en commentaire</div><div class="small">Votre réservation sera enregistrée</div></div>
+</div>
+</section>
+
+<section class="card" id="reservations">
+<h2>📌 Réservations — paiement en attente</h2>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:11px;margin-bottom:10px">
+<label>📱 Numéro de dépôt Mobile Money affiché sur le LIVE</label>
+<input id="mmInput" value="+226 70 00 00 00" onchange="renderMM()">
+<div id="mmLive" style="font-size:20px;font-weight:900;color:#f4c542;margin-top:5px">+226 70 00 00 00</div>
+<div class="small">Le client dépose le montant indiqué. Après vérification, appuie sur « Payé ».</div>
+</div>
+<div class="list" id="reservations"></div>
+</section>
+
+<section class="card" id="downloads">
+<h2>⬇️ Téléchargement des fichiers</h2>
+<p class="small">Exporte les ventes et sauvegarde les données de K Collection.</p>
+<div class="grid">
+<button class="primary" onclick="downloadCSV()">📄 Télécharger les ventes CSV</button>
+<button onclick="downloadReport()">🧾 Télécharger en PDF</button>
+<button onclick="downloadJSON()">💾 Sauvegarder les données</button>
+</div>
+</section>
+
+<section class="card full" id="stats">
+<h2>💰 Recette des ventes</h2>
+<div class="grid" id="revenueBox">
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">Recette encaissée</div><div id="revenue" style="font-size:25px;font-weight:900;color:#22c55e">0 FCFA</div></div>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">Commandes payées</div><div id="paidCount" style="font-size:25px;font-weight:900">0</div></div>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">En attente de paiement</div><div id="pendingAmount" style="font-size:25px;font-weight:900;color:#f4c542">0 FCFA</div></div>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">Panier moyen payé</div><div id="avgPaid" style="font-size:25px;font-weight:900">0 FCFA</div></div>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">Recette aujourd’hui</div><div id="dailyRevenue" style="font-size:25px;font-weight:900;color:#22c55e">0 FCFA</div></div>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">Recette cette semaine</div><div id="weeklyRevenue" style="font-size:25px;font-weight:900;color:#22c55e">0 FCFA</div></div>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">Recette ce mois</div><div id="monthlyRevenue" style="font-size:25px;font-weight:900;color:#22c55e">0 FCFA</div></div>
+<div style="background:#0e1219;border:1px solid #343b48;border-radius:12px;padding:14px"><div class="small">Recette totale</div><div id="totalRevenue" style="font-size:25px;font-weight:900;color:#f4c542">0 FCFA</div></div>
+</div>
+<h2 style="margin-top:18px">📋 Commandes et paiements</h2>
+<div class="tabs" id="orderTabs">
+<button class="active" onclick="setOrderFilter('all',this)">Toutes</button>
+<button onclick="setOrderFilter('pending',this)">En attente</button>
+<button onclick="setOrderFilter('paid',this)">Payées</button>
+</div>
+<div class="list" id="orders"></div>
+</section>
+</main>
+
+<script>
+let active=false, code="K125", price=8500, seq=0, saleRound=0, firstCommentId=null, roundCandidates=[], category="Tous", orderFilter="all", orderMode="multiple", currentLive=1, liveCandidates={1:[],2:[],3:[],4:[]};
+let names=["Aïcha","Fatou","Mariam","Sarah","Nadia","Aminata","Rokia","Oumou"];
+let reservations=[];
+let products=[
+ {code:"K125",name:"Robe élégante",cat:"Robes",price:8500,details:"M/L · Noir",img:"https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=400&q=80"},
+ {code:"K126",name:"T-shirt oversize",cat:"T-shirts",price:5500,details:"L/XL · Blanc",img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=400&q=80"},
+ {code:"K127",name:"Jean cargo",cat:"Jeans",price:9000,details:"38/40 · Bleu",img:"https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=400&q=80"},
+ {code:"K128",name:"Chemise femme",cat:"Chemises",price:7500,details:"M/L · Beige",img:"https://images.unsplash.com/photo-1605763240000-7e93b172d754?auto=format&fit=crop&w=400&q=80"}
+];
+const money=n=>Number(n).toLocaleString("fr-FR")+" FCFA";
+
+function setCategory(c,btn){
+ category=c;
+ document.querySelectorAll("#catTabs button").forEach(x=>x.classList.remove("active"));
+ btn.classList.add("active");
+ renderCatalogue();
+}
+function renderCatalogue(){
+ const list=products.filter(p=>category==="Tous"||p.cat===category);
+ document.getElementById("catalogue").innerHTML=list.map(p=>`
+ <div class="product-card ${p.code===code?'selected':''}" onclick="selectProduct('${p.code}')">
+ <img src="${p.img}">
+ <div style="color:#f4c542;font-weight:900;margin-top:7px">${p.code}</div>
+ <b>${p.name}</b><div class="small">${p.cat} · ${p.details}</div>
+ <label class="price-input">Prix de vente (FCFA)</label>
+ <input type="number" value="${p.price}" min="0" onclick="event.stopPropagation()" onchange="updateProductPrice('${p.code}',this.value)">
+ </div>`).join("");
+}
+function updateProductPrice(c,value){
+ const p=products.find(x=>x.code===c); if(!p)return;
+ p.price=Math.max(0,Number(value)||0);
+ if(c===code){
+   price=p.price;
+   document.getElementById("price").textContent=money(price);
+   document.getElementById("priceInput").value=price;
+ }
+ renderCatalogue(); saveData();
+}
+function selectProduct(c){
+ const p=products.find(x=>x.code===c); if(!p)return;
+ code=p.code; price=p.price;
+ document.getElementById("photo").src=p.img;
+ document.getElementById("code").textContent=p.code;
+ document.getElementById("article").textContent=p.name;
+ document.getElementById("details").textContent=p.details;
+ document.getElementById("price").textContent=money(p.price);
+ document.getElementById("codeInput").value=p.code;
+ document.getElementById("priceInput").value=p.price;
+ document.getElementById("overlayCode").textContent=p.code;
+ document.getElementById("status").textContent="Article "+p.code+" sélectionné."; renderCatalogue();
+}
+function previewPhotos(e){
+ const box=document.getElementById("photoPreview"); box.innerHTML="";
+ [...e.target.files].forEach(file=>{
+  const url=URL.createObjectURL(file);
+  const im=document.createElement("img"); im.src=url; im.style="width:80px;height:100px;object-fit:cover;border-radius:8px";
+  box.appendChild(im);
+ });
+}
+function startSale(){
+ code=document.getElementById("codeInput").value.trim().toUpperCase();
+ price=Number(document.getElementById("priceInput").value)||0;
+ // Nouvelle manche : aucune vente n'est enregistrée avant « Terminé ».
+ saleRound++;
+ firstCommentId=null;
+ roundCandidates=[];
+ active=true;
+ document.getElementById("status").textContent="🟢 Vente active : les clients doivent écrire "+code+".";
+ document.getElementById("overlay").innerHTML=`<div class="inner"><div class="crown">👗</div><div>Écrivez <b>${code}</b> en commentaire</div><div class="small">Réservation enregistrée automatiquement</div></div>`;
+ render(); saveData();
+}
+function nextArticle(){
+ // « Terminé » est le seul moment où les intéressés deviennent des ventes.
+ // Le code peut rester identique : chaque clic sur « Lancer la vente » crée une nouvelle manche.
+ if(!active){
+   document.getElementById("status").textContent="Aucune manche active. Clique d’abord sur Lancer la vente.";
+   return;
+ }
+
+ let toSave=[];
+ if(orderMode==='first'){
+   if(roundCandidates.length) toSave=[roundCandidates[0]];
+ } else if(orderMode==='manual'){
+   toSave=roundCandidates.slice();
+ } else {
+   toSave=roundCandidates.slice();
+ }
+
+ if(toSave.length){
+   toSave.forEach(r=>{
+     r.id=r.id||Date.now()+Math.random();
+     r.savedAt=new Date().toLocaleString('fr-FR');
+     if(orderMode==='first') r.selected=true;
+     reservations.push(r);
+     liveCandidates[currentLive].push(r);
+   });
+   const first=toSave[0];
+   if(orderMode==='first'){
+     first.validatedAt=new Date().toLocaleString('fr-FR');
+     first.selectedAt=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+     showReservation(first,'🥇 1ER COMMENTAIRE ENREGISTRÉ');
+   } else {
+     showReservation(first,'✅ VENTE(S) ENREGISTRÉE(S)');
+   }
+ }
+
+ const count=toSave.length;
+ roundCandidates=[];
+ firstCommentId=null;
+ active=false;
+ document.getElementById("status").textContent=count
+   ? `✅ Manche terminée : ${count} vente(s) enregistrée(s). Compteur remis à zéro.`
+   : `✅ Manche terminée : aucune vente enregistrée. Compteur remis à zéro.`;
+ render(); saveData();
+}
+
+function setMode(mode,btn){
+ orderMode=mode;
+ document.querySelectorAll("#modeTabs button").forEach(x=>x.classList.remove("selected"));
+ if(btn)btn.classList.add("selected");
+ const help={multiple:"Tous les clients qui manifestent leur intérêt peuvent être enregistrés.",first:"Seul le premier commentaire valide est retenu pour cet article.",lottery:"Les intéressés sont enregistrés, puis tu peux lancer le tirage au sort.",manual:"Tu choisis directement le client à enregistrer."};
+ document.getElementById("modeHelp").textContent=help[mode];
+ document.getElementById("drawBtn").style.display=mode==='lottery'?'block':'none';
+ document.getElementById("manualBox").style.display=mode==='manual'?'block':'none';
+}
+function switchLive(n,btn){
+ currentLive=n;
+ document.querySelectorAll("#liveTabs button").forEach(x=>x.classList.remove("active")); btn.classList.add("active");
+ document.getElementById("status").textContent=`LIVE ${n} sélectionné.`;
+ render();
+}
+function simulateComment(){
+ if(!active){alert("Lance d'abord la vente.");return}
+ const name=names[seq++%names.length];
+ const candidate={id:Date.now()+Math.random(),name,code,price,time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",second:"2-digit"}),paid:false,cancelled:false,live:currentLive,mode:orderMode,profile:name[0],round:saleRound};
+ // IMPORTANT : le commentaire est seulement mis en attente.
+ // Il ne devient une vente qu'après le clic sur « Terminé ».
+ if(orderMode==='first' && roundCandidates.length){ return; }
+ roundCandidates.push(candidate);
+ if(orderMode==='first') firstCommentId=candidate.id;
+ showReservation(candidate,orderMode==='first' ? "🥇 PREMIER COMMENTAIRE — EN ATTENTE DE VALIDATION" : "💬 COMMENTAIRE REÇU — EN ATTENTE");
+ render();
+}
+
+function drawWinner(){
+ const candidates=reservations.filter(r=>r.live===currentLive && r.code===code && !r.cancelled && !r.paid);
+ if(!candidates.length){alert("Aucun client intéressé à tirer au sort.");return}
+ const winner=candidates[Math.floor(Math.random()*candidates.length)];
+ showReservation(winner,"🎲 CLIENT TIRÉ AU SORT",true);
+}
+function markPaid(index){
+ const r=reservations[index];
+ if(!r || r.paid || r.cancelled)return;
+ r.paid=true; const now=new Date(); r.paidAt=now.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}); r.paidDate=now.toISOString();
+ showPaymentThanks(r);
+ render(); saveData();
+}
+function cancelOrder(index){
+ const r=reservations[index];
+ if(!r || r.paid || r.cancelled)return;
+ if(confirm(`Annuler la commande de ${r.name} (${r.code}) ?`)){
+   r.cancelled=true; r.cancelledAt=new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+   render(); saveData();
+ }
+}
+function showPaymentThanks(r){
+ const o=document.getElementById("overlay");
+ o.innerHTML=`<div class="inner"><div class="crown">💰</div><div class="winner">PAIEMENT CONFIRMÉ !</div><div style="font-size:48px;margin:10px">${r.profile||r.name[0]}</div><h2>Merci ${r.name} ❤️</h2><div>${r.code} · ${money(r.price)}</div><div class="reserve">Commande validée</div></div>`;
+ setTimeout(()=>{o.innerHTML=`<div class="inner"><div class="crown">👗</div><div>Écrivez <b>${code}</b> en commentaire</div><div class="small">${reservations.filter(x=>x.code===code&&!x.paid&&!x.cancelled).length} commande(s) en attente</div></div>`},3000);
+}
+function saveArticleEdits(){
+ const newCode=document.getElementById("codeInput").value.trim().toUpperCase();
+ const newPrice=Math.max(0,Number(document.getElementById("priceInput").value)||0);
+ if(!newCode){alert("Le code est obligatoire.");return;}
+ const duplicate=products.some(p=>p.code===newCode && p.code!==code);
+ if(duplicate){alert("Ce code article existe déjà.");return;}
+ const p=products.find(x=>x.code===code);
+ if(p){p.code=newCode;p.price=newPrice;}
+ code=newCode;price=newPrice;
+ document.getElementById("code").textContent=code;
+ document.getElementById("price").textContent=money(price);
+ document.getElementById("overlayCode").textContent=code;
+ document.getElementById("status").textContent="✅ Modifications enregistrées : "+code+" · "+money(price);
+ saveData(); renderCatalogue(); render();
+}
+function simulateSale(){
+ if(!active)active=true;
+ if(orderMode==='manual'){document.getElementById('manualProfile').focus();return;}
+ simulateComment();
+}
+function manualSelect(){
+ const profile=document.getElementById('manualProfile').value.trim();
+ if(orderMode!=='manual'){alert('Active d’abord le mode Sélection manuelle.');return;}
+ if(!profile){alert('Entre le profil TikTok du client.');return;}
+ const name=profile.replace(/^@/,'');
+ const r={id:Date.now()+Math.random(),name,profile,code,price,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),paid:false,cancelled:false,live:currentLive,mode:'manual',round:saleRound};
+ // Sélection manuelle aussi : rien n'est enregistré avant « Terminé ».
+ roundCandidates.push(r);
+ document.getElementById('manualProfile').value='';
+ showReservation(r,'✋ CLIENT SÉLECTIONNÉ — EN ATTENTE DE VALIDATION'); render();
+}
+function saveData(){localStorage.setItem('kcollection_products',JSON.stringify(products));localStorage.setItem('kcollection_reservations',JSON.stringify(reservations));localStorage.setItem('kcollection_mm',document.getElementById('mmInput')?.value||'');}
+function downloadCSV(){
+ const rows=[['Client','Profil','Article','Prix','Statut','Mode','LIVE','Date paiement']];
+ reservations.forEach(r=>rows.push([r.name,r.profile||'',r.code,r.price,r.cancelled?'Annulée':r.paid?'Payée':'En attente',r.mode||'',r.live||1,r.paidAt||'']));
+ const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='K_Collection_Ventes.csv';a.click();
+}
+function downloadReport(){
+ const paid=reservations.filter(r=>r.paid), revenue=paid.reduce((s,r)=>s+Number(r.price||0),0);
+ const now=new Date(), startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()), day=(now.getDay()+6)%7, startWeek=new Date(now.getFullYear(),now.getMonth(),now.getDate()-day), startMonth=new Date(now.getFullYear(),now.getMonth(),1);
+ const sumSince=d=>paid.reduce((s,r)=>{const pd=r.paidDate?new Date(r.paidDate):null;return s+(pd&&pd>=d?Number(r.price||0):0)},0);
+ const daily=sumSince(startToday), weekly=sumSince(startWeek), monthly=sumSince(startMonth);
+ const html=`<!doctype html><html lang="fr"><meta charset="utf-8"><title>K Collection - Rapport PDF</title><style>body{font-family:Arial;padding:24px;color:#111}h1{margin-bottom:4px}.box{display:inline-block;border:1px solid #ccc;padding:12px;margin:6px;width:20%}table{border-collapse:collapse;width:100%;margin-top:20px}td,th{border:1px solid #ccc;padding:7px;text-align:left}@media print{button{display:none}} </style><h1>K Collection — Rapport des ventes</h1><p>Généré le ${now.toLocaleString('fr-FR')}</p><div class="box"><b>Aujourd’hui</b><br>${money(daily)}</div><div class="box"><b>Cette semaine</b><br>${money(weekly)}</div><div class="box"><b>Ce mois</b><br>${money(monthly)}</div><div class="box"><b>Total</b><br>${money(revenue)}</div><table><tr><th>Client</th><th>Profil TikTok</th><th>Article</th><th>Prix</th><th>Statut</th><th>Date paiement</th><th>LIVE</th></tr>${reservations.map(r=>`<tr><td>${r.name}</td><td>${r.profile||''}</td><td>${r.code}</td><td>${money(r.price)}</td><td>${r.cancelled?'Annulée':r.paid?'Payée':'En attente'}</td><td>${r.paidDate?new Date(r.paidDate).toLocaleString('fr-FR'):''}</td><td>${r.live||1}</td></tr>`).join('')}</table><script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script></html>`;
+ const w=window.open('', '_blank'); if(!w){alert('Autorise les fenêtres pop-up pour générer le PDF.');return;} w.document.write(html); w.document.close();
+}
+
+function downloadJSON(){
+ const data={products,reservations,mobileMoney:document.getElementById('mmInput')?.value||'',exportedAt:new Date().toISOString()};
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='K_Collection_Donnees.json';a.click();
+}
+function loadData(){
+ try{const p=JSON.parse(localStorage.getItem('kcollection_products'));if(Array.isArray(p)&&p.length)products=p}catch(e){}
+ try{const r=JSON.parse(localStorage.getItem('kcollection_reservations'));if(Array.isArray(r))reservations=r}catch(e){}
+ const mm=localStorage.getItem('kcollection_mm');if(mm&&document.getElementById('mmInput')){document.getElementById('mmInput').value=mm;document.getElementById('mmLive').textContent=mm}
+}
+function renderMM(){document.getElementById("mmLive").textContent=document.getElementById("mmInput").value; saveData()}
+function setOrderFilter(filter,btn){
+ orderFilter=filter;
+ document.querySelectorAll("#orderTabs button").forEach(x=>x.classList.remove("active"));
+ btn.classList.add("active");
+ render();
+}
+function toggleComments(){
+ const section=document.getElementById("commentsSection");
+ if(!section)return;
+ section.classList.toggle("collapsed");
+ const btn=document.getElementById("commentsToggle");
+ if(btn)btn.textContent=section.classList.contains("collapsed")?"⌄":"⌃";
+}
+function render(){
+ document.getElementById("commentsList").innerHTML=roundCandidates.slice(-12).reverse().concat(reservations.slice(-12).reverse()).slice(0,24).map(r=>`<div class="row ${r.cancelled?'cancelled':''}"><span><span class="avatar">${r.profile||r.name[0]}</span><b>${r.name}</b> <span class="small">${r.code} · LIVE ${r.live||1}${roundCandidates.includes(r)?' · EN ATTENTE':''}</span></span><span class="time">${r.time}</span></div>`).join("")||'<div class="small">Aucun commentaire.</div>';
+ const pending=reservations.filter(r=>!r.paid&&!r.cancelled);
+ document.getElementById("reservations").innerHTML=pending.map(r=>{let i=reservations.indexOf(r);return `<div class="row"><span><span class="avatar">${r.profile||r.name[0]}</span><b>${r.name}</b><br><span class="small">${r.code} · LIVE ${r.live||1} · ${money(r.price)}</span></span><span style="display:flex;gap:6px;align-items:center"><span class="badge">En attente</span><button class="green" style="width:auto;padding:7px 9px" onclick="markPaid(${i})">💰 Payé</button><button class="cancel" style="width:auto;padding:7px 9px" onclick="cancelOrder(${i})">✕ Annuler</button></span></div>`}).join("")||'<div class="small">Aucune réservation en attente.</div>';
+ const filteredOrders=reservations.filter(r=>orderFilter==="all" || (orderFilter==="paid"&&r.paid) || (orderFilter==="pending"&&!r.paid&&!r.cancelled));
+ document.getElementById("orders").innerHTML=filteredOrders.map(r=>{let i=reservations.indexOf(r);return `<div class="row ${r.cancelled?'cancelled':''}"><span>#${String(i+1).padStart(3,"0")} · <b>${r.name}</b> · ${r.code} · LIVE ${r.live||1}<br><span class="small">${r.cancelled?'Commande annulée':r.paid&&r.paidAt?'Paiement validé à '+r.paidAt:'Paiement en attente'}</span></span><span style="display:flex;gap:6px;align-items:center">${money(r.price)} <span class="badge">${r.cancelled?'Annulée':r.paid?'Payé':'Non payé'}</span>${!r.paid&&!r.cancelled?`<button class="green" style="width:auto;padding:7px 9px" onclick="markPaid(${i})">💰 Payé</button><button class="cancel" style="width:auto;padding:7px 9px" onclick="cancelOrder(${i})">✕</button>`:""}</span></div>`}).join("")||'<div class="small">Aucune commande dans cette catégorie.</div>';
+ const paid=reservations.filter(r=>r.paid), pendingAmountList=reservations.filter(r=>!r.paid&&!r.cancelled);
+ const revenue=paid.reduce((sum,r)=>sum+Number(r.price||0),0), pendingAmount=pendingAmountList.reduce((sum,r)=>sum+Number(r.price||0),0);
+ const now=new Date(), startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()), day=(now.getDay()+6)%7, startWeek=new Date(now.getFullYear(),now.getMonth(),now.getDate()-day), startMonth=new Date(now.getFullYear(),now.getMonth(),1);
+ const paidDate=r=>r.paidDate?new Date(r.paidDate):null;
+ const sumSince=d=>paid.reduce((sum,r)=>{const pd=paidDate(r); return sum+(pd&&pd>=d?Number(r.price||0):0)},0);
+ const daily=sumSince(startToday), weekly=sumSince(startWeek), monthly=sumSince(startMonth);
+ document.getElementById("revenue").textContent=money(revenue); document.getElementById("paidCount").textContent=paid.length; document.getElementById("pendingAmount").textContent=money(pendingAmount); document.getElementById("avgPaid").textContent=money(paid.length?Math.round(revenue/paid.length):0);
+ document.getElementById("dailyRevenue").textContent=money(daily); document.getElementById("weeklyRevenue").textContent=money(weekly); document.getElementById("monthlyRevenue").textContent=money(monthly); document.getElementById("totalRevenue").textContent=money(revenue);
+}
+function showReservation(r,title){
+ const o=document.getElementById("overlay");
+ o.innerHTML=`<div class="inner"><div class="crown">✨</div><div class="winner">${title}</div><div style="font-size:48px;margin:8px">${r.profile||r.name[0]}</div><h2>${r.name}</h2><div>${r.code} · ${money(r.price)}</div><div class="reserve">${reservations.filter(x=>x.code===r.code&&!x.paid&&!x.cancelled).length} intéressé(s)</div></div>`;
+ for(let i=0;i<10;i++){let s=document.createElement("span");s.className="spark";s.textContent=["✨","💛","🎉","❤️"][i%4];s.style.left=(5+Math.random()*90)+"%";s.style.top=(5+Math.random()*25)+"%";o.appendChild(s)}
+ setTimeout(()=>{o.innerHTML=`<div class="inner"><div class="crown">👗</div><div>Écrivez <b>${code}</b> en commentaire</div><div class="small">${reservations.filter(x=>x.code===code&&!x.paid&&!x.cancelled).length} commande(s) en attente de paiement</div></div>`},3000);
+}
+loadData(); renderCatalogue(); selectProduct(code); setMode("multiple",document.querySelector("#modeTabs button")); render();
+</script>
+
+<nav class="mobileNav">
+<a href="#live"><span>🎥</span>LIVE</a>
+<a href="#catalogueSection"><span>👗</span>Articles</a>
+<a href="#commentsSection" onclick="toggleComments();return false"><span>💬</span>Commentaires</a>
+<a href="#reservations"><span>🛒</span>Commandes</a>
+<a href="#revenueBox"><span>📊</span>Stats</a><a href="#downloads"><span>⬇️</span>Fichiers</a>
+</nav>
+</body>
+</html>
